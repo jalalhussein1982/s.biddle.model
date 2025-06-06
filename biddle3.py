@@ -1,11 +1,24 @@
 import math
 import csv
 import itertools
-import numpy as np # For np.arange to handle float steps
+from typing import List  # using custom float_range instead of numpy
 
 # Epsilon for avoiding division by zero or for float comparisons
 EPSILON = 1e-9
 MAX_SIMULATION_DAYS = 1000 # Safeguard for maximum simulation duration
+
+
+def float_range(start: float, end: float, step: float) -> List[float]:
+    values = []
+    if step > 0:
+        while start <= end + EPSILON:
+            values.append(start)
+            start += step
+    else:
+        while start >= end - EPSILON:
+            values.append(start)
+            start += step
+    return values
 
 def get_variable_values_from_user(prompt_text, default_single_value_str):
     """
@@ -28,13 +41,13 @@ def get_variable_values_from_user(prompt_text, default_single_value_str):
                 if step == 0:
                     print("Step cannot be zero. Please re-enter.")
                     continue
-                # Use np.arange for robust float stepping
+                # Use float_range for robust float stepping
                 # Add a small epsilon to 'end' if step is positive to include 'end' if it's a multiple of step
                 # Subtract a small epsilon if step is negative
                 if step > 0:
-                    values = np.arange(start, end + EPSILON, step).tolist()
+                    values = float_range(start, end + EPSILON, step)
                 else: # step < 0
-                    values = np.arange(start, end - EPSILON, step).tolist()
+                    values = float_range(start, end - EPSILON, step)
                 
                 if not values: # If arange results in empty list (e.g. start=10, end=5, step=1)
                     print(f"Warning: Range {start},{end},{step} generated no values. Using start value: [{start}]")
